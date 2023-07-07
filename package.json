@@ -1,0 +1,25 @@
+{
+  "name": "logify_coursework",
+  "version": "1.0.0",
+  "description": "Logify is the web-application for reducing spendings of logistic companies by selecting additional nearest cargos",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon server.js",
+    "start:prod": "NODE_ENV=production nodemon server.js"
+  },
+  "author": "Mykola Lukashyn",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "bcryptjs": "^2.4.3",
+    "bluebird": "^3.7.2",
+    "dotenv": "^16.1.4",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.3.0",
+    "mongoose-paginate": "^5.0.3",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.22",
+    "slugify": "^1.6.6"
+  }
+}
