@@ -4,6 +4,8 @@ const router = express.Router();
 const verifyToken = require("../auth/verifyToken");
 const companyController = require("../controllers/companyController");
 
+router.route("/active-deliveries").get(companyController.getAllDeliveriesInfo);
+
 router
   .route("/")
   .get(companyController.getAllCompanies)

@@ -1,4 +1,5 @@
 const Truck = require("../models/truckModel");
+const APIFeatures = require("../utils/apiFeatures");
 
 exports.createTruck = async (req, res) => {
   try {
@@ -21,14 +22,21 @@ exports.createTruck = async (req, res) => {
 
 exports.getAllTrucks = async (req, res) => {
   try {
-    const trucks = await Truck.find();
+    const forCount = await Truck.find();
+
+    const features = new APIFeatures(Truck.find(), req.query)
+      .filter()
+      .sort()
+      .paginate()
+      .limitFields();
+
+    const trucks = await features.query;
 
     res.status(200).json({
       status: "success",
+      totalResults: forCount.length,
       results: trucks.length,
-      data: {
-        trucks,
-      },
+      trucks,
     });
   } catch (error) {
     res.status(500).json({

@@ -25,6 +25,10 @@ const CargoSchema = new mongoose.Schema({
       message: "At least one drop-off location must be specified",
     },
   },
+  cargoName: {
+    type: String,
+    required: [true, "Please provide a cargo name"],
+  },
   cargoType: {
     type: String,
     required: [true, "Please provide a cargo type!"],

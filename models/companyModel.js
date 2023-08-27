@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { v4: uuidv4 } = require("uuid");
 
 const CompanySchema = new mongoose.Schema({
   name: {
@@ -21,19 +22,29 @@ const CompanySchema = new mongoose.Schema({
     default: 0,
   },
   trucks: [{ type: mongoose.Schema.Types.ObjectId, ref: "Truck" }],
-  administrators: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  administrators: [
+    { type: mongoose.Schema.Types.ObjectId, ref: "User", unique: true },
+  ],
   deliveries: [
     {
+      deliveryId: {
+        type: String, // Используем тип String для уникальных идентификаторов
+        required: true,
+        unique: true,
+        default: uuidv4(),
+      },
       trucks: {
-        type: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Truck",
-          validate: {
-            validator: function (trucks) {
-              return trucks.length > 0;
-            },
-            message: "At least one truck must be added.",
+        type: [
+          {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Truck",
           },
+        ],
+        validate: {
+          validator: function (trucks) {
+            return trucks.length > 0;
+          },
+          message: "At least one truck must be added.",
         },
       },
       cargos: [
@@ -44,11 +55,9 @@ const CompanySchema = new mongoose.Schema({
       ],
       startDate: {
         type: Date,
-        required: true,
       },
       endDate: {
         type: Date,
-        required: true,
       },
       loadingFromDate: {
         type: Date,
@@ -75,6 +84,10 @@ const CompanySchema = new mongoose.Schema({
       },
       requireHumanitarian: {
         type: Boolean,
+      },
+      creatingDate: {
+        type: Date,
+        default: Date.now(),
       },
     },
   ],

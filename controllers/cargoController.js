@@ -1,4 +1,5 @@
 const Cargo = require("../models/cargoModel");
+const APIFeatures = require("../utils/apiFeatures");
 
 exports.createCargo = async (req, res) => {
   try {
@@ -21,14 +22,22 @@ exports.createCargo = async (req, res) => {
 
 exports.getAllCargos = async (req, res) => {
   try {
-    const cargos = await Cargo.find();
+    const forCount = await Cargo.find();
+    res.set("X-Total-Count", forCount.length);
+
+    const features = new APIFeatures(Cargo.find(), req.query)
+      .filter()
+      .sort()
+      .paginate()
+      .limitFields();
+
+    const cargos = await features.query;
 
     res.status(200).json({
       status: "success",
+      totalResults: forCount.length,
       results: cargos.length,
-      data: {
-        cargos,
-      },
+      cargos,
     });
   } catch (error) {
     res.status(500).json({
@@ -45,9 +54,7 @@ exports.getCargoById = async (req, res) => {
 
     res.status(200).json({
       status: "success",
-      data: {
-        cargo,
-      },
+      cargo,
     });
   } catch (error) {
     res.status(404).json({

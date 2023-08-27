@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const TruckSchema = new mongoose.Schema({
+  make: {
+    type: String,
+    required: [true, "Truck must have a make "],
+  },
   vinNum: {
     type: String,
     required: [true, "Trailer must have a VIN Number"],
@@ -30,7 +34,7 @@ const TruckSchema = new mongoose.Schema({
   },
   transportType: {
     type: String,
-    enum: ["truck", "semitrailer", "double road train"],
+    enum: ["Truck", "Semitrailer", "Double road train"],
   },
   truckPayload: {
     type: Number,
@@ -51,6 +55,20 @@ const TruckSchema = new mongoose.Schema({
     },
     weight: {
       type: Number,
+      required: true,
+    },
+  },
+  isAvailable: {
+    type: Boolean,
+    default: true,
+  },
+  location: {
+    type: {
+      type: String,
+      enum: ["Point"],
+    },
+    coordinates: {
+      type: [Number],
       required: true,
     },
   },
