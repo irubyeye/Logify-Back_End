@@ -6,6 +6,4 @@ The API incorporates essential features such as filters, sorting, and pagination
 
 By adhering to the best practices of REST and employing the MVC architecture, the API achieves a high level of modularity, separation of concerns, and scalability. The Node.js and Express combination offers a lightweight and efficient platform for building fast and reliable web applications. The choice of MongoDB as the database enables seamless handling of unstructured data, facilitating flexibility and scalability in the storage layer.
 
-Throughout the development process, I have prioritized code readability, maintainability, and adherence to industry standards. By following the established conventions and leveraging well-known libraries, I have ensured that the codebase remains clean, organized, and easily extensible."
-
-
+Throughout the development process, I have prioritized code readability, maintainability, and adherence to industry standards. By following the established conventions and leveraging well-known libraries, I have ensured that the codebase remains clean, organized, and easily extensible.
