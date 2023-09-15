@@ -14,6 +14,7 @@ const app = express();
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
+app.use(morgan("dev"));
 
 const corsOptions = {
   origin: "http://localhost:3000",
@@ -21,10 +22,24 @@ const corsOptions = {
   //optionsSuccessStatus: 204,
 };
 
+const AdminBro = require("admin-bro");
+const AdminBroExpress = require("@admin-bro/express");
+
+const adminBro = new AdminBro({
+  databases: [],
+  rootPath: "/logify/v1/admin",
+});
+
+const router = AdminBroExpress.buildRouter(adminBro);
+
+app.use(adminBro.options.rootPath, router);
+
 app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(express.static(`${__dirname}/public`));
+
+app.use(adminBro.options.rootPath, router);
 
 app.use("/logify/v1/user", userRouter);
 app.use("/logify/v1/cargos", cargoRouter);

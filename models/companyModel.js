@@ -22,9 +22,11 @@ const CompanySchema = new mongoose.Schema({
     default: 0,
   },
   trucks: [{ type: mongoose.Schema.Types.ObjectId, ref: "Truck" }],
-  administrators: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "User", unique: true },
-  ],
+  administrators: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    unique: true,
+  },
   deliveries: [
     {
       deliveryId: {
@@ -34,18 +36,9 @@ const CompanySchema = new mongoose.Schema({
         default: uuidv4(),
       },
       trucks: {
-        type: [
-          {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Truck",
-          },
-        ],
-        validate: {
-          validator: function (trucks) {
-            return trucks.length > 0;
-          },
-          message: "At least one truck must be added.",
-        },
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Truck",
+        default: "64ed2a0c76874c9547032262",
       },
       cargos: [
         {
@@ -91,6 +84,18 @@ const CompanySchema = new mongoose.Schema({
       },
     },
   ],
+});
+
+CompanySchema.pre("save", async function (next) {
+  const existingDocument = await this.constructor.findOne({
+    administrators: this.administrators,
+  });
+  if (existingDocument) {
+    const error = new Error("Only one account per Company!");
+    next(error);
+  } else {
+    next();
+  }
 });
 
 const Company = mongoose.model("Company", CompanySchema);

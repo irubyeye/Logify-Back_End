@@ -7,6 +7,7 @@ const verifyToken = require("../auth/verifyToken");
 
 router.route("/register").post(authorization.registration);
 router.route("/login").post(authorization.login);
+router.route("/isAdmin").get(verifyToken, userController.isAdmin);
 
 router.route("/").get(verifyToken, userController.getAllUsers);
 router

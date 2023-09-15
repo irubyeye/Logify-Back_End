@@ -47,9 +47,7 @@ exports.getCompanyById = async (req, res) => {
 
     res.status(200).json({
       status: "success",
-      data: {
-        company,
-      },
+      company,
     });
   } catch (error) {
     res.status(404).json({
@@ -104,16 +102,13 @@ exports.getAllDeliveriesInfo = async (req, res) => {
     const companies = await Company.find({})
       .populate({
         path: "deliveries.trucks",
-        // select: "name type", // Выбираем только поля name и type из коллекции Truck
       })
       .populate("deliveries.cargos")
-      .select(); // Выбираем только поле deliveries
-    //{ deliveries: 1, name: 1 }
+      .select();
 
-    // Создаем массив объектов с информацией о доставках из всех компаний
     const allDeliveriesInfo = companies.reduce((acc, company) => {
       const companyDeliveriesInfo = company.deliveries
-        .filter((delivery) => !delivery.endDate) // Фильтруем доставки без endDate
+        .filter((delivery) => !delivery.endDate)
         .map((delivery) => {
           return {
             companyId: company._id,
@@ -124,18 +119,129 @@ exports.getAllDeliveriesInfo = async (req, res) => {
             loadingToDate: delivery.loadingToDate,
             departureLocation: delivery.departureLocation,
             destination: delivery.destination,
-            truckInfo: delivery.trucks,
+            trucks: delivery.trucks,
           };
         });
       return [...acc, ...companyDeliveriesInfo];
     }, []);
 
-    res.status(200).json({ deliveries: allDeliveriesInfo });
+    res.status(200).json({
+      results: allDeliveriesInfo.length,
+      deliveries: allDeliveriesInfo,
+    });
   } catch (error) {
     res.status(404).json({
       status: "fail",
       message: error,
       details: error.message,
+    });
+  }
+};
+
+exports.hasCompany = async (req, res) => {
+  const userId = req.params.id;
+
+  const company = await Company.findOne({
+    administrators: userId,
+  });
+  if (company) {
+    res.status(200).json({
+      has: true,
+      company: company._id,
+    });
+  } else {
+    return res.status(200).json({
+      has: false,
+      status: "fail",
+      message: "Company not found for the specified user",
+    });
+  }
+};
+
+exports.getUserDeliveries = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    const company = await Company.findOne({
+      administrators: userId,
+    })
+      .populate({
+        path: "deliveries.trucks",
+        model: "Truck",
+      })
+      .populate({
+        path: "deliveries.cargos",
+        model: "Cargo",
+      })
+      .exec();
+
+    if (!company) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Company not found for the specified user",
+      });
+    }
+
+    const activeDeliveries = [];
+    const endedDeliveries = [];
+
+    company.deliveries.forEach((delivery) => {
+      if (delivery.endDate) {
+        endedDeliveries.push(delivery);
+      } else {
+        activeDeliveries.push(delivery);
+      }
+    });
+
+    const deliveries = {
+      companyName: company.name,
+      companyDescription: company.description,
+      activeDeliveries,
+      endedDeliveries,
+    };
+
+    res.status(200).json({
+      status: "success",
+      deliveries,
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "fail",
+      message: error,
+      details: error.message,
+    });
+  }
+};
+
+exports.createActiveDelivery = async (req, res) => {
+  try {
+    const companyId = req.params.id;
+    const deliveryData = req.body;
+
+    const activeDelivery = {
+      ...deliveryData,
+    };
+    const company = await Company.findByIdAndUpdate(
+      companyId,
+      { $push: { deliveries: activeDelivery } },
+      { new: true }
+    );
+
+    if (!company) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Company not found",
+      });
+    }
+
+    res.status(201).json({
+      status: "success",
+      company,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: error.message,
     });
   }
 };

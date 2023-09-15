@@ -107,14 +107,24 @@ exports.deleteCargo = async (req, res) => {
 exports.userCargos = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const userCargos = await Cargo.find({ cargoHolder: userId });
+    const forCount = await Cargo.find({ cargoHolder: userId });
+
+    const features = new APIFeatures(
+      Cargo.find({ cargoHolder: userId }),
+      req.query
+    )
+      .filter()
+      .sort()
+      .paginate()
+      .limitFields();
+
+    const cargos = await features.query;
 
     res.status(200).json({
       status: "success",
-      results: userCargos.length,
-      data: {
-        userCargos,
-      },
+      totalResults: forCount.length,
+      results: cargos.length,
+      cargos,
     });
   } catch (error) {
     res.status(404).json({

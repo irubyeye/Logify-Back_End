@@ -2,8 +2,6 @@ const User = require("../models/userModel");
 
 exports.getAllUsers = async (req, res) => {
   try {
-    //console.log(req.user);
-
     if (req.user.role === "admin") {
       const users = await User.find();
 
@@ -28,13 +26,11 @@ exports.getAllUsers = async (req, res) => {
 
 exports.getUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.id).select("-password -role");
 
     res.status(200).json({
       status: "success",
-      data: {
-        user,
-      },
+      user,
     });
   } catch (error) {
     res.status(404).json({
@@ -85,5 +81,15 @@ exports.deleteUser = async (req, res) => {
     }
   } else {
     res.status(403).json({ error: "Access Denied" });
+  }
+};
+
+exports.isAdmin = async (req, res) => {
+  if (req.user.role === "admin") {
+    res.status(200).json({
+      status: true,
+    });
+  } else {
+    res.status(403).json({ status: false });
   }
 };

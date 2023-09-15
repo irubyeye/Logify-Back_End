@@ -5,6 +5,11 @@ const verifyToken = require("../auth/verifyToken");
 const companyController = require("../controllers/companyController");
 
 router.route("/active-deliveries").get(companyController.getAllDeliveriesInfo);
+router.route("/my-deliveries/:id").get(companyController.getUserDeliveries);
+router.route("/has-company/:id").get(companyController.hasCompany);
+router
+  .route("/create-delivery/:id")
+  .post(companyController.createActiveDelivery);
 
 router
   .route("/")
